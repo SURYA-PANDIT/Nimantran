@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>मधु एवं अभिषेक — शुभ सगाई समारोह</title>
+  <meta name="description" content="मधु दुबे एवं अभिषेक तिवारी के शुभ सगाई समारोह की शाही डिजिटल निमंत्रण पत्रिका - 26 नवंबर 2026, श्री इन मैरिज हॉल, जगनीपुर, प्रतापगढ़।" />
+
+  <!-- Open Graph / WhatsApp Sharing -->
+  <meta property="og:title" content="मधु एवं अभिषेक — शुभ सगाई समारोह निमंत्रण" />
+  <meta property="og:description" content="दिनांक: 26 नवंबर 2026, समय: शाम 4 बजे | समारोह स्थल: श्री इन मैरिज हॉल, जगनीपुर, प्रतापगढ़। सपरिवार पधारकर वर-वधू को आशीर्वाद प्रदान करें।" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="./assets/engagement-invitation.jpg" />
+  <meta name="theme-color" content="#35030c" />
+
+  <!-- Google Fonts: Noto Serif Devanagari, Cinzel, Cormorant Garamond -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Cormorant+Garamond:wght@600;700&family=Noto+Serif+Devanagari:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <!-- Royal Canvas Particles & Fireworks Layer -->
+  <canvas id="particlesCanvas"></canvas>
+  <canvas id="fireworksCanvas"></canvas>
+
+  <!-- Floating Balloons Container -->
+  <div id="balloonsContainer" class="balloons-container hidden"></div>
+
+  <!-- Audio Player (Background Wedding Music & Synth Fallback) -->
+  <audio id="bgMusic" src="./assets/background-music.mp3" loop preload="auto"></audio>
+
+  <!-- ==================== SCENE 1: ROYAL ENVELOPE ==================== -->
+  <section id="envelopeScene" class="scene-envelope">
+    <!-- Outer Golden Decorative Border Frame -->
+    <div class="golden-arch-border">
+      <div class="corner-ornament corner-tl"></div>
+      <div class="corner-ornament corner-tr"></div>
+      <div class="corner-ornament corner-bl"></div>
+      <div class="corner-ornament corner-br"></div>
+    </div>
+
+    <!-- Top Skip Action -->
+    <div class="top-skip-bar">
+      <button id="btnSkip" class="btn-skip">
+        <span>सीधे विवरण देखें</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+    </div>
+
+    <!-- Center Content -->
+    <div class="envelope-center-content">
+      <!-- Top Ganesha Emblem -->
+      <div class="ganesha-header">
+        <svg class="ganesha-icon" viewBox="0 0 100 100" width="70" height="70">
+          <circle cx="50" cy="48" r="42" stroke="url(#goldGrad)" stroke-width="1.2" stroke-dasharray="3 2" opacity="0.6" fill="none" />
+          <circle cx="50" cy="48" r="38" stroke="url(#goldGrad)" stroke-width="0.8" opacity="0.4" fill="none" />
+          <path d="M38 28 L50 14 L62 28 L56 31 L50 25 L44 31 Z" fill="url(#goldGrad)" stroke="#510712" stroke-width="0.5" />
+          <circle cx="50" cy="18" r="1.5" fill="#FFF7E7" />
+          <path d="M42 27 L58 27" stroke="url(#goldGrad)" stroke-width="1.5" />
+          <path d="M40 38 C32 36 24 44 26 54 C28 62 36 64 42 58" stroke="url(#goldGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" />
+          <path d="M60 38 C68 36 76 44 74 54 C72 62 64 64 58 58" stroke="url(#goldGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" />
+          <path d="M42 42 C42 36 58 36 58 42 C58 50 56 60 56 68 C56 74 62 76 64 72" stroke="url(#goldGrad)" stroke-width="3" fill="none" stroke-linecap="round" />
+          <path d="M44 48 L44 54" stroke="#FFF7E7" stroke-width="2" stroke-linecap="round" />
+          <path d="M47 34 L53 34 M48 37 L52 37" stroke="#EF4444" stroke-width="1.2" stroke-linecap="round" />
+          <circle cx="50" cy="41" r="1.2" fill="#EF4444" />
+          <defs>
+            <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFF7D6" />
+              <stop offset="35%" stop-color="#F7E6B0" />
+              <stop offset="70%" stop-color="#D6B56D" />
+              <stop offset="100%" stop-color="#9E782F" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <h1 class="shree-ganesh-title">॥ ॐ श्री गणेशाय नमः ॥</h1>
+      <p class="sub-header-text">सादर आमंत्रण</p>
+
+      <div class="indian-divider">
+        <span class="divider-line"></span>
+        <span class="divider-ornament">✤ मांगलिक प्रसंग ✤</span>
+        <span class="divider-line"></span>
+      </div>
+
+      <!-- THE 3D ENVELOPE STAGE -->
+      <div class="envelope-stage">
+        <div id="envelopeAura" class="envelope-aura"></div>
+
+        <div id="envelopeContainer" class="envelope-box">
+          <!-- Back Body (Base Layer) -->
+          <div class="envelope-back-body">
+            <div class="envelope-watermark"></div>
+            <div class="envelope-inner-border"></div>
+          </div>
+
+          <!-- Inside Golden Letter -->
+          <div id="envelopeLetter" class="envelope-letter">
+            <div class="letter-inner-frame"></div>
+            <div class="letter-top">॥ श्री गणेशाय नमः ॥</div>
+            <div class="letter-event">शुभ सगाई समारोह</div>
+            <div class="letter-divider"></div>
+
+            <div class="letter-couple">
+              <span class="couple-name">आयु. कु. मधु दुबे</span>
+              <span class="couple-sang">संग</span>
+              <span class="couple-name">चि. अभिषेक तिवारी</span>
+            </div>
+
+            <div class="letter-footer">
+              <span>26 नवंबर 2026</span>
+              <span>•</span>
+              <span>शाम 4 बजे</span>
+            </div>
+          </div>
+
+          <!-- Front Pocket SVG (Covers lower half) -->
+          <div class="envelope-pocket">
+            <svg viewBox="0 0 360 230" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="pocketBase" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#4A0512" />
+                  <stop offset="60%" stop-color="#35030C" />
+                  <stop offset="100%" stop-color="#220106" />
+                </linearGradient>
+                <linearGradient id="pocketBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#F7E6B0" />
+                  <stop offset="50%" stop-color="#D6B56D" />
+                  <stop offset="100%" stop-color="#8F6723" />
+                </linearGradient>
+              </defs>
+              <path d="M0,0 L165,115 L0,230 Z" fill="url(#pocketBase)" stroke="url(#pocketBorder)" stroke-width="1.2" />
+              <path d="M360,0 L195,115 L360,230 Z" fill="url(#pocketBase)" stroke="url(#pocketBorder)" stroke-width="1.2" />
+              <path d="M0,230 L180,105 L360,230 Z" fill="url(#pocketBase)" stroke="url(#pocketBorder)" stroke-width="1.4" />
+            </svg>
+            <div class="pocket-corner-bl">✦</div>
+            <div class="pocket-corner-br">✦</div>
+          </div>
+
+          <!-- Top Folding Flap (Hinged top with Centered Wax Seal Button) -->
+          <div id="envelopeFlap" class="envelope-flap">
+            <svg viewBox="0 0 360 135" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="flapBase" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#550816" />
+                  <stop offset="60%" stop-color="#3C040E" />
+                  <stop offset="100%" stop-color="#2A0208" />
+                </linearGradient>
+                <linearGradient id="flapBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#FFF7D6" />
+                  <stop offset="50%" stop-color="#D6B56D" />
+                  <stop offset="100%" stop-color="#9E782F" />
+                </linearGradient>
+              </defs>
+              <path d="M0,0 L360,0 L180,130 Z" fill="url(#flapBase)" stroke="url(#flapBorder)" stroke-width="2" />
+              <path d="M25,6 L335,6 L180,118 Z" fill="none" stroke="rgba(247, 230, 176, 0.4)" stroke-width="1" stroke-dasharray="4 2" />
+            </svg>
+
+            <!-- Centered Wax Seal Button (Dead Center at apex) -->
+            <div id="waxSealBtn" class="wax-seal-button" title="क्लिक करके निमंत्रण खोलें">
+              <div class="wax-seal-inner">
+                <svg viewBox="0 0 100 100" width="26" height="26">
+                  <path d="M38 28 L50 14 L62 28 Z" fill="#510712" />
+                  <path d="M42 42 C42 36 58 36 58 42 C58 50 56 60 56 68 C56 74 62 76 64 72" stroke="#510712" stroke-width="4" fill="none" stroke-linecap="round" />
+                  <circle cx="50" cy="40" r="2" fill="#EF4444" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Couple Names Header Outside Envelope -->
+      <div class="outside-couple-info">
+        <h2 class="ceremony-tag">शुभ सगाई समारोह</h2>
+        <div class="names-flow">
+          <span>आयु. कु. मधु दुबे</span>
+          <span class="sang-pill">संग</span>
+          <span>चि. अभिषेक तिवारी</span>
+        </div>
+        <p class="date-time-tag">26 नवंबर 2026 • शाम 4 बजे</p>
+      </div>
+    </div>
+
+    <!-- Bottom Opening Action Button -->
+    <div class="bottom-cta-wrap">
+      <button id="btnOpenEnvelope" class="btn-primary-royal">
+        <span class="sparkle-icon">✨</span>
+        <span id="btnOpenText">निमंत्रण खोलें ✨</span>
+      </button>
+      <p class="cta-hint">एक बार टैप करके उत्सव प्रारंभ करें</p>
+    </div>
+  </section>
+
+  <!-- ==================== SCENE 2: GRAND PALACE GATE ==================== -->
+  <section id="gateScene" class="scene-gate hidden">
+    <div class="gate-arch-top">
+      <div class="gate-kalash-icon">🪔</div>
+      <h2>शुभ सगाई समारोह</h2>
+      <p>द्वार खुल रहे हैं...</p>
+    </div>
+
+    <div class="gate-perspective-box">
+      <div id="gateLeft" class="gate-door gate-door-left">
+        <div class="gate-ornaments">
+          <div class="door-grill"></div>
+          <div class="door-handle door-handle-left"></div>
+        </div>
+      </div>
+      <div id="gateRight" class="gate-door gate-door-right">
+        <div class="gate-ornaments">
+          <div class="door-grill"></div>
+          <div class="door-handle door-handle-right"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== MAIN INVITATION CONTENT ==================== -->
+  <div id="mainContent" class="main-content hidden">
+    <!-- Sticky Navigation Header -->
+    <header class="royal-nav-header">
+      <div class="nav-container">
+        <button id="btnNavHome" class="brand-title">
+          <span class="gold-accent">॥</span>
+          <span>मधु & अभिषेक</span>
+          <span class="gold-accent">॥</span>
+        </button>
+
+        <nav class="desktop-nav">
+          <a href="#ceremony">सगाई समारोह</a>
+          <a href="#couple">वर-वधू</a>
+          <a href="#original-card">मूल पत्रिका</a>
+          <a href="#venue">समारोह स्थल</a>
+          <a href="#thankyou">धन्यवाद</a>
+        </nav>
+
+        <div class="nav-actions">
+          <a href="https://www.google.com/maps?q=25.805283,82.182689" target="_blank" rel="noopener noreferrer" class="btn-nav-location">
+            <span>📍 स्थान देखें</span>
+          </a>
+          <button id="btnMobileMenu" class="mobile-menu-btn" aria-label="Menu">☰</button>
+        </div>
+      </div>
+
+      <!-- Mobile Menu Dropdown -->
+      <div id="mobileMenu" class="mobile-dropdown hidden">
+        <a href="#ceremony" class="mobile-link">सगाई समारोह</a>
+        <a href="#couple" class="mobile-link">वर-वधू</a>
+        <a href="#original-card" class="mobile-link">मूल निमंत्रण पत्रिका</a>
+        <a href="#venue" class="mobile-link">समारोह स्थल (मैरिज हॉल)</a>
+        <a href="#thankyou" class="mobile-link">सादर आमंत्रक एवं धन्यवाद</a>
+      </div>
+    </header>
+
+    <main class="page-body">
+      <!-- Section 1: Ceremony Invocation -->
+      <section id="ceremony" class="ceremony-section">
+        <div class="center-emblem">
+          <div class="emblem-circle">
+            <svg viewBox="0 0 100 100" width="64" height="64">
+              <circle cx="50" cy="48" r="42" stroke="url(#goldGrad)" stroke-width="1.2" stroke-dasharray="3 2" fill="none" opacity="0.6"/>
+              <path d="M38 28 L50 14 L62 28 Z" fill="url(#goldGrad)" stroke="#510712" stroke-width="0.5"/>
+              <path d="M42 42 C42 36 58 36 58 42 C58 50 56 60 56 68 C56 74 62 76 64 72" stroke="url(#goldGrad)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+              <circle cx="50" cy="41" r="1.5" fill="#EF4444"/>
+            </svg>
+          </div>
+        </div>
+
+        <p class="invoc-shree">॥ ॐ श्री गणेशाय नमः ॥</p>
+        <h1 class="invoc-title">शुभ सगाई समारोह</h1>
+        <p class="invoc-sub">ENGAGEMENT CEREMONY</p>
+
+        <div class="indian-divider">
+          <span class="divider-line"></span>
+          <span class="divider-ornament">✤ मांगलिक प्रसंग ✤</span>
+          <span class="divider-line"></span>
+        </div>
+
+        <p class="invoc-desc">
+          सपरिवार पधारकर वर-वधू को अपना स्नेह एवं आशीर्वाद प्रदान करें।
+        </p>
+      </section>
+
+      <!-- Section 2: Couple Reveal (Bride -> Centered "संग" -> Groom) -->
+      <section id="couple" class="couple-section">
+        <!-- 1. Bride Box (वधू) -->
+        <div class="royal-card bride-card">
+          <div class="corner-ornament corner-tl"></div>
+          <div class="corner-ornament corner-tr"></div>
+          <div class="corner-ornament corner-bl"></div>
+          <div class="corner-ornament corner-br"></div>
+
+          <div class="role-badge">वधू</div>
+          <h2 class="person-title">आयु. कु. मधु दुबे</h2>
+          <div class="card-gold-line"></div>
+
+          <div class="family-tree">
+            <p><span class="label">सुपुत्री:</span> श्री विजय नाथ दुबे (सुरेन्द्र दुबे) एवं श्रीमती संध्या दुबे</p>
+            <p><span class="label">पौत्री:</span> श्री रमापति दुबे (Advocate) एवं श्रीमती मालती देवी</p>
+          </div>
+        </div>
+
+        <!-- 2. Centered "✦ ❤️ संग ❤️ ✦" Badge -->
+        <div class="sang-connection-box">
+          <div class="sang-center-badge">
+            <span class="sparkle">✦</span>
+            <span class="heart-pulse">❤️</span>
+            <span class="sang-word">संग</span>
+            <span class="heart-pulse">❤️</span>
+            <span class="sparkle">✦</span>
+          </div>
+        </div>
+
+        <!-- 3. Groom Box (वर) -->
+        <div class="royal-card groom-card">
+          <div class="corner-ornament corner-tl"></div>
+          <div class="corner-ornament corner-tr"></div>
+          <div class="corner-ornament corner-bl"></div>
+          <div class="corner-ornament corner-br"></div>
+
+          <div class="role-badge">वर</div>
+          <h2 class="person-title">चि. अभिषेक तिवारी</h2>
+          <div class="card-gold-line"></div>
+
+          <div class="family-tree">
+            <p><span class="label">सुपुत्र:</span> श्री ओम प्रकाश तिवारी एवं श्रीमती गुड़िया तिवारी</p>
+            <p><span class="label">निवास:</span> निवास: सरौली, बदलापुर, जौनपुर</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Event Time & Date Highlight Banner -->
+      <section class="banner-highlight">
+        <div class="banner-inner">
+          <div class="banner-item">
+            <span class="banner-icon">📅</span>
+            <div>
+              <span class="banner-lbl">समारोह दिनांक</span>
+              <span class="banner-val">26 नवंबर 2026</span>
+            </div>
+          </div>
+          <div class="banner-divider"></div>
+          <div class="banner-item">
+            <span class="banner-icon">⏰</span>
+            <div>
+              <span class="banner-lbl">शुभ मुहूर्त समय</span>
+              <span class="banner-val">शाम 4 बजे</span>
+            </div>
+          </div>
+          <div class="banner-divider"></div>
+          <a href="https://www.google.com/maps?q=25.805283,82.182689" target="_blank" rel="noopener noreferrer" class="banner-item banner-link">
+            <span class="banner-icon">📍</span>
+            <div>
+              <span class="banner-lbl">समारोह स्थल 📍</span>
+              <span class="banner-val">जगनीपुर, प्रतापगढ़</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Inviter & Blessing Cards -->
+      <section class="family-section">
+        <div class="royal-card inviter-card">
+          <div class="role-badge">सादर आमंत्रक / प्रेषक</div>
+          <h3 class="person-title">श्री चन्द्रपाल दुबे</h3>
+          <div class="role-sub">[ पूर्व प्रधान ]</div>
+          <p class="address-text">ग्राम कुंदहा, रामापुर, जौनपुर</p>
+          <div class="contact-footer">
+            <span>सम्पर्क सूत्र:</span>
+            <a href="tel:+919236550246" class="phone-link">+91 92365 50246</a>
+          </div>
+        </div>
+
+        <div class="royal-card blessing-card">
+          <div class="diya-icon">🪔</div>
+          <h3 class="blessing-title">आपकी उपस्थिति प्रार्थनीय है</h3>
+          <p class="blessing-quote">
+            &ldquo;हमारे इस मांगलिक अवसर पर पधारकर वर-वधू को अपना शुभाशीर्वाद प्रदान करें एवं हमारे आतिथ्य को स्वीकार कर हमें अनुगृहीत करें।&rdquo;
+          </p>
+          <div class="mantra-line">॥ सर्व मंगल मांगल्ये शिवे सर्वार्थ साधिके ॥</div>
+        </div>
+      </section>
+
+      <!-- Section: Original Card -->
+      <section id="original-card" class="original-card-section">
+        <div class="section-heading">
+          <span class="heading-tag">मुद्रित स्वरूप</span>
+          <h2>मूल निमंत्रण पत्रिका</h2>
+          <p>आपकी सुविधा के लिए मूल निमंत्रण पत्रिका यहाँ प्रस्तुत है।</p>
+        </div>
+
+        <div class="card-display-box">
+          <div id="btnCardZoom" class="card-image-wrap" title="पत्रिका बड़े आकार में देखें">
+            <img id="detailedCardImg" src="./assets/engagement-invitation.jpg" alt="मूल सगाई निमंत्रण पत्रिका - मधु एवं अभिषेक" />
+            <div class="image-overlay-hint">
+              <span>पत्रिका बड़े आकार में देखें 🔍</span>
+            </div>
+          </div>
+          <div class="card-actions-bar">
+            <span>सगाई पत्र • 26 नवंबर 2026</span>
+            <button id="btnZoomAction" class="btn-zoom">पत्रिका बड़े आकार में देखें 🔍</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Venue Section -->
+      <section id="venue" class="venue-section">
+        <div class="section-heading">
+          <span class="heading-tag">समारोह स्थल विवरण</span>
+          <h2>समारोह स्थल</h2>
+          <p>आपके सुगम आगमन हेतु स्थल की जानकारी एवं संपर्क सूत्र</p>
+        </div>
+
+        <div class="royal-card venue-card">
+          <div class="venue-pin-badge">📍</div>
+          <h3 class="venue-hall-title">श्री इन मैरिज हॉल</h3>
+          <p class="venue-city">जगनीपुर, प्रतापगढ़</p>
+
+          <div class="venue-pill-row">
+            <span class="pill">दिनांक: 26 नवंबर 2026</span>
+            <span class="pill">समय: शाम 4 बजे</span>
+          </div>
+
+          <!-- Exact Requested Google Maps Coordinates & Format -->
+          <div class="venue-buttons-grid">
+            <a href="https://www.google.com/maps?q=25.805283,82.182689" target="_blank" rel="noopener noreferrer" class="btn-action btn-gold">
+              <span>📍 स्थान का रास्ता देखें</span>
+            </a>
+            <a href="tel:+919236550246" class="btn-action btn-maroon">
+              <span>📞 संपर्क करें</span>
+            </a>
+            <a href="https://wa.me/919236550246?text=%E0%A4%B8%E0%A4%BE%E0%A4%A6%E0%A4%B0%20%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A4%A3%E0%A4%BE%E0%A4%AE%2C%20%E0%A4%AE%E0%A4%A7%E0%A5%81%20%E0%A4%8F%E0%A4%B5%E0%A4%82%20%E0%A4%85%E0%A4%AD%E0%A4%BF%E0%A4%87%E0%A5%87%E0%A4%95%20%E0%A4%B8%E0%A4%97%E0%A4%BE%E0%A4%88%20%E0%A4%B8%E0%A4%AE%E0%A4%BE%E0%A4%B0%E0%A5%8B%E0%A4%B9" target="_blank" rel="noopener noreferrer" class="btn-action btn-green">
+              <span>💬 व्हाट्सऐप संदेश</span>
+            </a>
+          </div>
+
+          <div class="venue-footnote">
+            <span>सहायता अथवा मार्ग दर्शन हेतु संपर्क सूत्र: </span>
+            <a href="tel:+919236550246" class="phone-link">+91 92365 50246</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Thank You Finale -->
+      <footer id="thankyou" class="thankyou-section">
+        <div class="royal-card thankyou-card">
+          <div class="center-emblem">
+            <div class="emblem-circle">
+              <svg viewBox="0 0 100 100" width="64" height="64">
+                <circle cx="50" cy="48" r="42" stroke="url(#goldGrad)" stroke-width="1.2" stroke-dasharray="3 2" fill="none" opacity="0.6"/>
+                <path d="M38 28 L50 14 L62 28 Z" fill="url(#goldGrad)" stroke="#510712" stroke-width="0.5"/>
+                <path d="M42 42 C42 36 58 36 58 42 C58 50 56 60 56 68 C56 74 62 76 64 72" stroke="url(#goldGrad)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                <circle cx="50" cy="41" r="1.5" fill="#EF4444"/>
+              </svg>
+            </div>
+          </div>
+          <p class="invoc-shree">॥ ॐ श्री गणेशाय नमः ॥</p>
+
+          <h2 class="thankyou-main-heading">आपकी उपस्थिति सादर प्रार्थनीय है।</h2>
+          <p class="thankyou-sub-text">
+            सपरिवार पधारकर वर-वधू को अपना स्नेह एवं आशीर्वाद प्रदान करें।
+          </p>
+
+          <div class="thankyou-badge-wrap">
+            <span class="thankyou-badge">धन्यवाद!</span>
+          </div>
+
+          <!-- Section 1F Final Inviter: श्री विजय नाथ दुबे [सुरेन्द्र दुबे] -->
+          <div class="final-inviter-box">
+            <div class="final-lbl">सादर आमंत्रक:</div>
+            <p class="final-name">श्री विजय नाथ दुबे [सुरेन्द्र दुबे]</p>
+            <p class="final-addr">ग्राम कुंदहा, रामापुर, जौनपुर</p>
+            <p class="final-phone">
+              <span>संपर्क: </span>
+              <a href="tel:+919236550246" class="phone-link">+91 92365 50246</a>
+            </p>
+          </div>
+
+          <div class="mantra-line">॥ सर्व मंगल मांगल्ये शिवे सर्वार्थ साधिके ॥</div>
+        </div>
+
+        <div class="footer-actions">
+          <button id="btnReplay" class="btn-replay">
+            <span>🔄 निमंत्रण पुनः देखें (प्रारंभ से)</span>
+          </button>
+        </div>
+
+        <p class="footer-copy">
+          मधु एवं अभिषेक शुभ सगाई समारोह • 26 नवंबर 2026
+        </p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- ==================== MODAL: ORIGINAL CARD LIGHTBOX ==================== -->
+  <div id="cardModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <button id="btnCloseModal" class="btn-close-modal" aria-label="Close">✕</button>
+      <div class="modal-header">
+        <h3>मूल सगाई निमंत्रण पत्रिका</h3>
+        <p>मधु एवं अभिषेक • 26 नवंबर 2026</p>
+      </div>
+      <div class="modal-image-wrap">
+        <img src="./assets/engagement-invitation.jpg" alt="विस्तृत निमंत्रण पत्रिका" />
+      </div>
+    </div>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
