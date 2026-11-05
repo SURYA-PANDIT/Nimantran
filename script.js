@@ -653,7 +653,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ==================== SLOW AUTO SCROLL ====================
   (function () {
-    const SPEED = 30;          // pixels per second (lower = slower)
+    const SPEED =70;          // pixels per second (lower = slower)
     const START_DELAY = 2500;  // wait after invitation opens (ms)
     const RESUME_DELAY = 4000; // resume after user stops touching (ms)
 
