@@ -650,4 +650,72 @@ document.addEventListener('DOMContentLoaded', () => {
   cardModal.addEventListener('click', (e) => {
     if (e.target === cardModal) closeModal();
   });
+
+  // ==================== SLOW AUTO SCROLL ====================
+  (function () {
+    const SPEED = 30;          // pixels per second (lower = slower)
+    const START_DELAY = 2500;  // wait after invitation opens (ms)
+    const RESUME_DELAY = 4000; // resume after user stops touching (ms)
+
+    let running = false, last = 0, pos = 0, resumeTimer = null, started = false;
+
+    function atBottom() {
+      return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+    }
+
+    function blocked() {
+      const modalOpen = cardModal && !cardModal.classList.contains('hidden');
+      const gateOpen = endGateOverlay && !endGateOverlay.classList.contains('hidden');
+      return modalOpen || gateOpen;
+    }
+
+    function step(t) {
+      if (!running) return;
+      if (!last) last = t;
+      const dt = Math.min((t - last) / 1000, 0.1);
+      last = t;
+
+      if (!blocked()) {
+        pos += SPEED * dt;
+        const whole = Math.floor(pos);
+        if (whole >= 1) {
+          window.scrollBy({ top: whole, behavior: 'instant' });
+          pos -= whole;
+        }
+      }
+
+      if (atBottom()) { stopScroll(); return; }
+      requestAnimationFrame(step);
+    }
+
+    function startScroll() {
+      if (running || atBottom() || mainContent.classList.contains('hidden')) return;
+      running = true; last = 0;
+      requestAnimationFrame(step);
+    }
+
+    function stopScroll() { running = false; }
+
+    function pauseThenResume() {
+      stopScroll();
+      clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(startScroll, RESUME_DELAY);
+    }
+
+    window.addEventListener('touchstart', () => { stopScroll(); clearTimeout(resumeTimer); }, { passive: true });
+    window.addEventListener('touchend', pauseThenResume, { passive: true });
+    window.addEventListener('wheel', pauseThenResume, { passive: true });
+
+    const scrollObserver = new MutationObserver(() => {
+      if (mainContent.classList.contains('hidden')) {
+        started = false;
+        stopScroll();
+        clearTimeout(resumeTimer);
+      } else if (!started) {
+        started = true;
+        setTimeout(startScroll, START_DELAY);
+      }
+    });
+    scrollObserver.observe(mainContent, { attributes: true, attributeFilter: ['class'] });
+  })();
 });
