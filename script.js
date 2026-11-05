@@ -128,11 +128,414 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ==================== CELEBRATION BALLOONS (18 Royal Balloons) ====================
-  function launchBalloons() {
+  // ==================== MEGA CELEBRATION ENGINE ====================
+  // Balloons 🎈 | Crackers & Fireworks 💥 | Confetti & Poppers 🎊🎉 | Sparkles 💫 | Falling Leaves 🍁
+  const CEL_EMOJIS = ['🎊', '🎉', '💥', '💫', '🍁', '✨', '🎈', '🪔', '🌸', '⭐'];
+  const CEL_COLORS = ['#FFF7D6', '#F7E6B0', '#FFD700', '#F59E0B', '#FB923C', '#EF4444', '#F43F5E', '#EC4899', '#A855F7', '#38BDF8', '#10B981', '#FFFFFF'];
+  const CEL_STYLES = ['peony', 'ring', 'star', 'heart', 'willow', 'double', 'crackle'];
+  const CEL_MAX_PARTS = 1300;
+  const CEL_EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+
+  let celCanvas = null;
+  let celCtx = null;
+  let celW = 0;
+  let celH = 0;
+  let celParts = [];
+  let celRunning = false;
+  let celLastTs = 0;
+  let celActiveUntil = 0;
+  let celTimers = [];
+
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+  function resizeCel() {
+    if (!celCanvas) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    celW = window.innerWidth;
+    celH = window.innerHeight;
+    celCanvas.width = Math.floor(celW * dpr);
+    celCanvas.height = Math.floor(celH * dpr);
+    celCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function ensureCelCanvas() {
+    if (celCanvas) return;
+    celCanvas = document.createElement('canvas');
+    celCanvas.id = 'celebrationCanvas';
+    document.body.appendChild(celCanvas);
+    celCtx = celCanvas.getContext('2d');
+    resizeCel();
+    window.addEventListener('resize', resizeCel);
+  }
+
+  function celAt(fn, ms) {
+    celTimers.push(setTimeout(fn, ms));
+  }
+
+  function celBegin(durationMs) {
+    ensureCelCanvas();
+    celTimers.forEach((t) => clearTimeout(t));
+    celTimers = [];
+    celActiveUntil = performance.now() + durationMs;
+    if (!celRunning) {
+      celRunning = true;
+      celLastTs = performance.now();
+      requestAnimationFrame(celStep);
+    }
+  }
+
+  // ---------- spawners ----------
+  function celSpark(x, y, vx, vy, color, o = {}) {
+    if (celParts.length > CEL_MAX_PARTS) return;
+    celParts.push({
+      t: 's', x, y, vx, vy, color,
+      a: 1,
+      decay: o.decay || (0.011 + Math.random() * 0.01),
+      r: o.r || (1.3 + Math.random() * 1.5),
+      g: o.g !== undefined ? o.g : 0.05,
+      drag: o.drag || 0.985,
+      tw: !!o.tw,
+    });
+  }
+
+  function celEmojiParticle(x, y, vx, vy, o = {}) {
+    if (celParts.length > CEL_MAX_PARTS) return;
+    celParts.push({
+      t: 'e', x, y, vx, vy,
+      ch: o.ch || (Math.random() < 0.3 ? '🍁' : pick(CEL_EMOJIS)),
+      size: o.size || rnd(20, 34),
+      rot: rnd(0, 6.28), vr: rnd(-0.08, 0.08),
+      drag: o.drag || 0.985, g: o.g !== undefined ? o.g : 0.05,
+      maxVy: o.maxVy || rnd(1.6, 2.6),
+      ph: rnd(0, 6.28), vph: rnd(0.03, 0.08), sw: o.sw !== undefined ? o.sw : 0.7,
+    });
+  }
+
+  function celBurst(x, y, style) {
+    const s = Math.max(0.85, Math.min(1.6, Math.min(celW, celH) / 400));
+    const c1 = pick(CEL_COLORS);
+    const c2 = pick(CEL_COLORS);
+    let n;
+
+    switch (style) {
+      case 'ring':
+        n = 54;
+        for (let i = 0; i < n; i++) {
+          const a = (Math.PI * 2 * i) / n;
+          celSpark(x, y, Math.cos(a) * 4.4 * s, Math.sin(a) * 4.4 * s, c1, { g: 0.03, drag: 0.982 });
+        }
+        for (let i = 0; i < 26; i++) {
+          const a = (Math.PI * 2 * i) / 26;
+          celSpark(x, y, Math.cos(a) * 2.2 * s, Math.sin(a) * 2.2 * s, c2, { g: 0.03, drag: 0.982 });
+        }
+        break;
+
+      case 'star': {
+        const verts = [];
+        for (let i = 0; i < 10; i++) {
+          const ang = (Math.PI * i) / 5 - Math.PI / 2;
+          const rad = i % 2 === 0 ? 5.2 : 2.2;
+          verts.push([Math.cos(ang) * rad, Math.sin(ang) * rad]);
+        }
+        for (let i = 0; i < 10; i++) {
+          const a = verts[i];
+          const b = verts[(i + 1) % 10];
+          for (let j = 0; j < 7; j++) {
+            const f = j / 7;
+            celSpark(x, y, (a[0] + (b[0] - a[0]) * f) * s, (a[1] + (b[1] - a[1]) * f) * s, '#FFD700', { g: 0.025, drag: 0.98, r: 1.8 });
+          }
+        }
+        break;
+      }
+
+      case 'heart':
+        n = 64;
+        for (let i = 0; i < n; i++) {
+          const t = (Math.PI * 2 * i) / n;
+          const hx = 16 * Math.pow(Math.sin(t), 3);
+          const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+          celSpark(x, y, hx * 0.27 * s, hy * 0.27 * s, '#FF4D6D', { g: 0.022, drag: 0.98, r: 1.9 });
+        }
+        break;
+
+      case 'willow':
+        n = 46;
+        for (let i = 0; i < n; i++) {
+          const a = rnd(0, Math.PI * 2);
+          const sp = rnd(1.4, 4.6) * s;
+          celSpark(x, y, Math.cos(a) * sp, Math.sin(a) * sp, '#FFD27A', { decay: 0.0065, g: 0.065, drag: 0.984, r: 1.3, tw: true });
+        }
+        break;
+
+      case 'double':
+        for (let i = 0; i < 52; i++) {
+          const a = rnd(0, Math.PI * 2);
+          const sp = rnd(3.2, 5.2) * s;
+          celSpark(x, y, Math.cos(a) * sp, Math.sin(a) * sp, c1);
+        }
+        for (let i = 0; i < 30; i++) {
+          const a = rnd(0, Math.PI * 2);
+          const sp = rnd(1.2, 3) * s;
+          celSpark(x, y, Math.cos(a) * sp, Math.sin(a) * sp, c2);
+        }
+        break;
+
+      case 'crackle':
+        for (let i = 0; i < 42; i++) {
+          const a = rnd(0, Math.PI * 2);
+          const sp = rnd(2, 5) * s;
+          celSpark(x, y, Math.cos(a) * sp, Math.sin(a) * sp, '#FFFFFF', { tw: true, decay: 0.01 });
+        }
+        celAt(() => {
+          for (let k = 0; k < 7; k++) {
+            const px = x + rnd(-60, 60) * s;
+            const py = y + rnd(-40, 70) * s;
+            for (let i = 0; i < 9; i++) {
+              const a = rnd(0, Math.PI * 2);
+              const sp = rnd(0.8, 2.2);
+              celSpark(px, py, Math.cos(a) * sp, Math.sin(a) * sp, pick(CEL_COLORS), { tw: true, decay: 0.03, r: 1.3 });
+            }
+          }
+        }, 380);
+        break;
+
+      case 'peony':
+      default:
+        n = 74;
+        for (let i = 0; i < n; i++) {
+          const a = (Math.PI * 2 * i) / n + rnd(-0.06, 0.06);
+          const sp = rnd(2.2, 5.6) * s;
+          celSpark(x, y, Math.cos(a) * sp, Math.sin(a) * sp, c1);
+        }
+        break;
+    }
+
+    // Emoji pop flung out of the burst (🎊 🎉 💥 💫 🍁)
+    if (Math.random() < 0.35) {
+      const cnt = 3 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < cnt; i++) {
+        const a = rnd(0, Math.PI * 2);
+        const sp = rnd(2, 4.2) * s;
+        celEmojiParticle(x, y, Math.cos(a) * sp, Math.sin(a) * sp, { g: 0.05, drag: 0.972, sw: 0.3, size: rnd(20, 30) });
+      }
+    }
+  }
+
+  function celRocket(x, ty, style) {
+    const g = 0.12;
+    const vy = -Math.sqrt(2 * g * Math.max(60, celH - ty));
+    celParts.push({ t: 'r', x, y: celH + 10, vx: rnd(-0.6, 0.6), vy, ty, style: style || pick(CEL_STYLES) });
+  }
+
+  function celVolley(n) {
+    for (let i = 0; i < n; i++) {
+      celAt(() => celRocket(celW * rnd(0.1, 0.9), celH * rnd(0.13, 0.42), pick(CEL_STYLES)), i * 140 + rnd(0, 90));
+    }
+  }
+
+  // Party-popper cannon: angle 0 = straight up, + leans right, - leans left
+  function celCannon(x, y, angle, count) {
+    for (let i = 0; i < count; i++) {
+      if (celParts.length > CEL_MAX_PARTS) return;
+      const a = ((angle + rnd(-20, 20)) * Math.PI) / 180;
+      const sp = rnd(8, 19);
+      const vx = Math.sin(a) * sp;
+      const vy = -Math.cos(a) * sp;
+      const roll = Math.random();
+
+      if (roll < 0.14) {
+        celEmojiParticle(x, y, vx * 0.75, vy * 0.75, { g: 0.07, drag: 0.972, sw: 0.5, maxVy: rnd(2, 3) });
+      } else if (roll < 0.3) {
+        celParts.push({
+          t: 'w', x, y, vx: vx * 0.9, vy: vy * 0.9,
+          len: rnd(34, 64), amp: rnd(4, 8), lw: rnd(2, 3.2),
+          rot: rnd(-0.5, 0.5), vr: rnd(-0.04, 0.04),
+          color: pick(CEL_COLORS), drag: 0.975, g: 0.08, maxVy: rnd(2.2, 3),
+          ph: rnd(0, 6.28), vph: rnd(0.1, 0.22), sw: 0.3,
+        });
+      } else {
+        celParts.push({
+          t: 'p', x, y, vx, vy,
+          w: rnd(6, 11), h: rnd(9, 18),
+          rot: rnd(0, 6.28), vr: rnd(-0.3, 0.3),
+          flip: rnd(0, 6.28), vf: rnd(0.08, 0.3),
+          color: pick(CEL_COLORS), drag: 0.972, g: 0.09, maxVy: rnd(2.4, 3.4),
+          ph: rnd(0, 6.28), vph: rnd(0.04, 0.1), sw: rnd(0.2, 0.8),
+        });
+      }
+    }
+  }
+
+  function celCannons(n) {
+    celCannon(celW * 0.03, celH + 6, 24, n);
+    celCannon(celW * 0.97, celH + 6, -24, n);
+  }
+
+  function celRain(count) {
+    for (let i = 0; i < count; i++) {
+      if (celParts.length > CEL_MAX_PARTS) return;
+      celParts.push({
+        t: 'p', x: rnd(0, celW), y: -rnd(10, 520),
+        vx: rnd(-0.5, 0.5), vy: rnd(1, 2.4),
+        w: rnd(6, 10), h: rnd(9, 16),
+        rot: rnd(0, 6.28), vr: rnd(-0.12, 0.12),
+        flip: rnd(0, 6.28), vf: rnd(0.06, 0.2),
+        color: pick(CEL_COLORS), drag: 0.99, g: 0.02, maxVy: rnd(2, 3.2),
+        ph: rnd(0, 6.28), vph: rnd(0.03, 0.08), sw: rnd(0.4, 1),
+      });
+    }
+  }
+
+  function celEmojiRain(count) {
+    for (let i = 0; i < count; i++) {
+      celEmojiParticle(rnd(0, celW), -rnd(20, 420), rnd(-0.4, 0.4), rnd(0.8, 1.8), { g: 0.015, drag: 0.995, sw: 0.9, size: rnd(22, 36), maxVy: rnd(1.4, 2.4) });
+    }
+  }
+
+  function celGrandFinale() {
+    for (let i = 0; i < 7; i++) {
+      celAt(() => celRocket(celW * (0.08 + i * 0.14), celH * rnd(0.12, 0.45), pick(CEL_STYLES)), i * 90);
+    }
+    celCannons(70);
+    celCannon(celW * 0.5, celH + 6, 0, 60);
+    celRain(50);
+    celEmojiRain(14);
+    launchBalloons(30);
+  }
+
+  // ---------- main loop ----------
+  function celStep(ts) {
+    if (!celRunning) return;
+    const dt = Math.min(Math.max(ts - celLastTs, 1), 50);
+    celLastTs = ts;
+    const k = dt / 16.667;
+
+    celCtx.clearRect(0, 0, celW, celH);
+
+    // update
+    for (let i = celParts.length - 1; i >= 0; i--) {
+      const p = celParts[i];
+      let dead = false;
+
+      if (p.t === 's') {
+        const d = Math.pow(p.drag, k);
+        p.vx *= d;
+        p.vy = p.vy * d + p.g * k;
+        p.x += p.vx * k;
+        p.y += p.vy * k;
+        p.a -= p.decay * k;
+        if (p.a <= 0) dead = true;
+      } else if (p.t === 'r') {
+        p.x += p.vx * k;
+        p.y += p.vy * k;
+        p.vy += 0.12 * k;
+        celSpark(p.x, p.y, rnd(-0.4, 0.4), rnd(0.4, 1.4), '#FFD27A', { decay: 0.055, r: 1.2, g: 0.02 });
+        celSpark(p.x, p.y, rnd(-0.3, 0.3), rnd(0.2, 1), '#FFFFFF', { decay: 0.08, r: 0.9, g: 0.02 });
+        if (p.vy >= -0.5 || p.y <= p.ty) {
+          celBurst(p.x, p.y, p.style);
+          dead = true;
+        }
+      } else {
+        // paper / streamer / emoji
+        const d = Math.pow(p.drag, k);
+        p.vx *= d;
+        p.vy = p.vy * d + p.g * k;
+        if (p.vy > p.maxVy) p.vy = p.maxVy;
+        p.ph += p.vph * k;
+        p.x += (p.vx + Math.sin(p.ph) * p.sw) * k;
+        p.y += p.vy * k;
+        p.rot += p.vr * k;
+        if (p.t === 'p') p.flip += p.vf * k;
+        if (p.y > celH + 70 || p.x < -90 || p.x > celW + 90) dead = true;
+      }
+
+      if (dead) {
+        celParts[i] = celParts[celParts.length - 1];
+        celParts.pop();
+      }
+    }
+
+    // draw: solid pieces first
+    celCtx.globalCompositeOperation = 'source-over';
+    celCtx.globalAlpha = 1;
+    celCtx.textAlign = 'center';
+    celCtx.textBaseline = 'middle';
+    for (let i = 0; i < celParts.length; i++) {
+      const p = celParts[i];
+      if (p.t === 'p') {
+        celCtx.save();
+        celCtx.translate(p.x, p.y);
+        celCtx.rotate(p.rot);
+        celCtx.scale(1, Math.cos(p.flip));
+        celCtx.fillStyle = p.color;
+        celCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        celCtx.restore();
+      } else if (p.t === 'w') {
+        celCtx.save();
+        celCtx.translate(p.x, p.y);
+        celCtx.rotate(p.rot);
+        celCtx.strokeStyle = p.color;
+        celCtx.lineWidth = p.lw;
+        celCtx.lineCap = 'round';
+        celCtx.beginPath();
+        for (let j = 0; j <= 8; j++) {
+          const yy = (j / 8) * p.len;
+          const xx = Math.sin(p.ph + j * 0.9) * p.amp;
+          if (j === 0) celCtx.moveTo(xx, yy);
+          else celCtx.lineTo(xx, yy);
+        }
+        celCtx.stroke();
+        celCtx.restore();
+      } else if (p.t === 'e') {
+        celCtx.save();
+        celCtx.translate(p.x, p.y);
+        celCtx.rotate(p.rot);
+        celCtx.font = `${Math.round(p.size)}px ${CEL_EMOJI_FONT}`;
+        celCtx.fillText(p.ch, 0, 0);
+        celCtx.restore();
+      }
+    }
+
+    // draw: glowing sparks & rockets (additive)
+    celCtx.globalCompositeOperation = 'lighter';
+    celCtx.lineCap = 'round';
+    for (let i = 0; i < celParts.length; i++) {
+      const p = celParts[i];
+      if (p.t === 's') {
+        celCtx.globalAlpha = p.tw ? p.a * (0.55 + Math.random() * 0.45) : p.a;
+        celCtx.strokeStyle = p.color;
+        celCtx.lineWidth = p.r * 1.6;
+        celCtx.beginPath();
+        celCtx.moveTo(p.x - p.vx * 1.9, p.y - p.vy * 1.9);
+        celCtx.lineTo(p.x, p.y);
+        celCtx.stroke();
+      } else if (p.t === 'r') {
+        celCtx.globalAlpha = 1;
+        celCtx.strokeStyle = '#FFF3C4';
+        celCtx.lineWidth = 2.6;
+        celCtx.beginPath();
+        celCtx.moveTo(p.x - p.vx * 3, p.y - p.vy * 3);
+        celCtx.lineTo(p.x, p.y);
+        celCtx.stroke();
+      }
+    }
+    celCtx.globalAlpha = 1;
+    celCtx.globalCompositeOperation = 'source-over';
+
+    // finish when everything has faded & no more scheduled waves
+    if (celParts.length === 0 && performance.now() > celActiveUntil) {
+      celCtx.clearRect(0, 0, celW, celH);
+      celRunning = false;
+      return;
+    }
+    requestAnimationFrame(celStep);
+  }
+
+  // ==================== CELEBRATION BALLOONS (🎈 big colourful waves) ====================
+  function launchBalloons(count = 26) {
     if (!balloonsContainer) return;
     balloonsContainer.classList.remove('hidden');
-    balloonsContainer.innerHTML = '';
 
     const colors = [
       { primary: '#F7E6B0', edge: '#8F6723' }, // Royal Gold
@@ -144,179 +547,94 @@ document.addEventListener('DOMContentLoaded', () => {
       { primary: '#E11D48', edge: '#4C0519' }, // Rose Ruby
       { primary: '#10B981', edge: '#064E3B' }, // Emerald Auspicious
       { primary: '#FFF7D6', edge: '#B48A3C' }, // Ivory Champagne
+      { primary: '#EC4899', edge: '#831843' }, // Festive Pink
+      { primary: '#A855F7', edge: '#4C1D95' }, // Royal Violet
+      { primary: '#38BDF8', edge: '#0C4A6E' }, // Sky Blue
     ];
 
-    const balloonCount = 18;
-    for (let i = 0; i < balloonCount; i++) {
+    for (let i = 0; i < count; i++) {
+      const isEmoji = Math.random() < 0.16;
       const b = document.createElement('div');
-      b.className = 'balloon';
+      const left = 2 + Math.random() * 94;
+      const delay = (Math.random() * 2.2).toFixed(2);
+      const duration = (5.2 + Math.random() * 3.2).toFixed(2);
+      const sway = Math.round((Math.random() < 0.5 ? -1 : 1) * (18 + Math.random() * 46));
 
-      const width = 36 + Math.floor(Math.random() * 26);
-      const height = Math.floor(width * 1.28);
-      const leftPercent = 3 + (i * 5.2) + (Math.random() * 4 - 2);
-      const delay = (Math.random() * 1.6).toFixed(2);
-      const duration = (3.6 + Math.random() * 1.6).toFixed(2);
-      const theme = colors[i % colors.length];
+      b.style.left = `${left}%`;
+      b.style.setProperty('--sway', `${sway}px`);
 
-      b.style.width = `${width}px`;
-      b.style.height = `${height}px`;
-      b.style.left = `${Math.min(95, Math.max(3, leftPercent))}%`;
-      b.style.background = `radial-gradient(circle at 35% 35%, #FFFFFF 0%, ${theme.primary} 45%, ${theme.edge} 100%)`;
-      b.style.animation = `floatUpwardRoyal ${duration}s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${delay}s forwards`;
+      if (isEmoji) {
+        b.className = 'balloon-emoji';
+        b.textContent = '🎈';
+        b.style.fontSize = `${Math.round(34 + Math.random() * 24)}px`;
+      } else {
+        const width = 38 + Math.floor(Math.random() * 32);
+        const theme = colors[Math.floor(Math.random() * colors.length)];
+        b.className = 'balloon';
+        b.style.width = `${width}px`;
+        b.style.height = `${Math.floor(width * 1.28)}px`;
+        b.style.background = `radial-gradient(circle at 35% 35%, #FFFFFF 0%, ${theme.primary} 45%, ${theme.edge} 100%)`;
+      }
 
+      b.style.animation = `balloonRise ${duration}s linear ${delay}s both`;
+      b.addEventListener('animationend', () => {
+        b.remove();
+        if (!balloonsContainer.childElementCount) balloonsContainer.classList.add('hidden');
+      });
       balloonsContainer.appendChild(b);
     }
-
-    setTimeout(() => {
-      balloonsContainer.classList.add('hidden');
-      balloonsContainer.innerHTML = '';
-    }, 4500);
   }
 
-  // ==================== CELEBRATION CONFETTI & POPPERS (💥 🎊 🎉) ====================
+  // ==================== CONFETTI CANNONS & POPPERS (💥 🎊 🎉) ====================
   function launchConfetti() {
-    if (!confettiContainer) return;
-    confettiContainer.classList.remove('hidden');
-    confettiContainer.innerHTML = '';
-
-    const emojis = ['🎊', '🎉', '💥', '✨', '🪔', '⭐'];
-    const foilColors = ['#FFF7D6', '#F7E6B0', '#D6B56D', '#EF4444', '#F59E0B', '#F43F5E', '#10B981'];
-
-    for (let i = 0; i < 36; i++) {
-      const piece = document.createElement('div');
-      piece.className = 'confetti-piece';
-
-      const size = 8 + Math.floor(Math.random() * 10);
-      const left = Math.random() * 98;
-      const delay = (Math.random() * 1.5).toFixed(2);
-      const duration = (3.2 + Math.random() * 1.4).toFixed(2);
-      const bg = foilColors[Math.floor(Math.random() * foilColors.length)];
-      const isCircle = Math.random() > 0.5;
-
-      piece.style.left = `${left}%`;
-      piece.style.width = `${size}px`;
-      piece.style.height = `${isCircle ? size : size * 1.8}px`;
-      piece.style.borderRadius = isCircle ? '50%' : '2px';
-      piece.style.backgroundColor = bg;
-      piece.style.boxShadow = `0 0 6px ${bg}`;
-      piece.style.animation = `confettiFall ${duration}s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${delay}s forwards`;
-
-      confettiContainer.appendChild(piece);
-    }
-
-    for (let i = 0; i < 14; i++) {
-      const em = document.createElement('div');
-      em.className = 'confetti-emoji';
-      em.textContent = emojis[i % emojis.length];
-
-      const left = 5 + Math.random() * 90;
-      const delay = (0.2 + Math.random() * 1.5).toFixed(2);
-      const duration = (3.0 + Math.random() * 1.3).toFixed(2);
-
-      em.style.left = `${left}%`;
-      em.style.animation = `emojiTumble ${duration}s ease-out ${delay}s forwards`;
-
-      confettiContainer.appendChild(em);
-    }
-
-    setTimeout(() => {
-      confettiContainer.classList.add('hidden');
-      confettiContainer.innerHTML = '';
-    }, 4500);
+    ensureCelCanvas();
+    celCannons(80);
+    celCannon(celW * 0.5, celH + 6, 0, 40);
+    celRain(70);
+    celEmojiRain(14);
   }
 
-  // ==================== FIREWORKS ON CANVAS (Multi-burst Patakha 💥) ====================
-  const fwCanvas = document.getElementById('fireworksCanvas');
-  const fwCtx = fwCanvas ? fwCanvas.getContext('2d') : null;
-  let fireworks = [];
-  let fireworksRunning = false;
-
-  function resizeCanvas() {
-    if (!fwCanvas) return;
-    fwCanvas.width = window.innerWidth;
-    fwCanvas.height = window.innerHeight;
-  }
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
-
+  // ==================== FIREWORKS / CRACKERS — GRAND OPENING TIMELINE ====================
+  // Synced with the opening sequence: envelope (0s) -> gate fades in (1.6s) -> doors open (3.1s) -> invitation reveals (6.5s)
   function triggerFireworks() {
-    if (!fwCanvas || !fwCtx) return;
-    fireworksRunning = true;
-    fireworks = [];
-    const colors = ['#FFF7D6', '#F7E6B0', '#D6B56D', '#EF4444', '#F59E0B', '#F43F5E', '#10B981', '#A855F7'];
+    celBegin(11000);
+    celVolley(4);
+    celAt(() => celVolley(3), 900);
+    celAt(() => { celCannons(60); launchBalloons(24); celVolley(2); }, 1600);
+    celAt(() => celVolley(3), 2600);
+    celAt(celGrandFinale, 3100);
+    celAt(() => { celVolley(4); celCannons(50); }, 4300);
+    celAt(() => { celVolley(3); celEmojiRain(16); }, 5500);
+    celAt(celGrandFinale, 6500);
+    celAt(() => { celVolley(3); launchBalloons(20); }, 7800);
+  }
 
-    function createBurst(x, y, count = 40, maxSpeed = 5) {
-      for (let i = 0; i < count; i++) {
-        const angle = (Math.PI * 2 * i) / count + (Math.random() * 0.2);
-        const speed = 1.8 + Math.random() * maxSpeed;
-        fireworks.push({
-          x,
-          y,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed,
-          alpha: 1,
-          decay: 0.012 + Math.random() * 0.012,
-          radius: 1.5 + Math.random() * 2.2,
-          color: colors[Math.floor(Math.random() * colors.length)],
-        });
-      }
-    }
+  // Lighter celebration when the visitor skips straight to the details
+  function celebrateQuick() {
+    celBegin(6500);
+    celVolley(3);
+    launchBalloons(22);
+    celCannons(55);
+    celRain(50);
+    celEmojiRain(10);
+    celAt(() => celVolley(3), 1500);
+    celAt(celGrandFinale, 2800);
+  }
 
-    createBurst(fwCanvas.width * 0.25, fwCanvas.height * 0.38, 38, 4.5);
-    createBurst(fwCanvas.width * 0.75, fwCanvas.height * 0.38, 38, 4.5);
-
-    setTimeout(() => {
-      if (fireworksRunning) createBurst(fwCanvas.width * 0.5, fwCanvas.height * 0.26, 50, 5.5);
-    }, 280);
-
-    setTimeout(() => {
-      if (fireworksRunning) {
-        createBurst(fwCanvas.width * 0.35, fwCanvas.height * 0.48, 32, 4.0);
-        createBurst(fwCanvas.width * 0.65, fwCanvas.height * 0.48, 32, 4.0);
-      }
-    }, 600);
-
-    function animateFw() {
-      if (!fireworksRunning) return;
-      fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
-
-      for (let i = fireworks.length - 1; i >= 0; i--) {
-        const p = fireworks[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.045;
-        p.vx *= 0.985;
-        p.alpha -= p.decay;
-
-        if (p.alpha <= 0) {
-          fireworks.splice(i, 1);
-        } else {
-          fwCtx.save();
-          fwCtx.globalAlpha = p.alpha;
-          fwCtx.fillStyle = p.color;
-          fwCtx.shadowBlur = 6;
-          fwCtx.shadowColor = p.color;
-          fwCtx.beginPath();
-          fwCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-          fwCtx.fill();
-          fwCtx.restore();
-        }
-      }
-
-      if (fireworks.length > 0) {
-        requestAnimationFrame(animateFw);
-      } else {
-        fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
-        fireworksRunning = false;
-      }
-    }
-    requestAnimationFrame(animateFw);
-
-    setTimeout(() => {
-      fireworksRunning = false;
-      fireworks = [];
-      if (fwCtx && fwCanvas) fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
-    }, 4500);
+  // ==================== ENDING CELEBRATION (when the palace gate closes) ====================
+  // Synced with the closing gate: doors swing (0.15s) -> doors meet (2.55s) -> royal card appears (2.85s)
+  function startEndCelebration() {
+    celBegin(12500);
+    celVolley(2);
+    celCannons(40);
+    launchBalloons(24);
+    celAt(() => { celVolley(3); celEmojiRain(12); }, 1200);
+    celAt(celGrandFinale, 2550);
+    celAt(() => { celCannons(80); celVolley(5); launchBalloons(30); }, 3300);
+    celAt(() => { celVolley(4); celRain(60); }, 4800);
+    celAt(celGrandFinale, 6200);
+    celAt(() => { celVolley(3); celCannons(50); launchBalloons(18); }, 8000);
+    celAt(() => { celVolley(3); celEmojiRain(14); }, 9800);
   }
 
   // ==================== GOLDEN PARTICLES BACKGROUND ====================
@@ -436,6 +754,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function skipDirectlyToMain() {
     clearOpeningTimers();
     playWeddingMusic();
+    celebrateQuick();
     envelopeScene.classList.add('hidden');
     envelopeScene.classList.remove('dissolving');
     gateScene.classList.add('hidden');
@@ -495,6 +814,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!endGateOverlay || endGateShown) return;
     endGateShown = true;
     cancelEndGateClose();
+    startEndCelebration();
     if (btnFloatingCloseGate) btnFloatingCloseGate.classList.add('hidden');
 
     // Step 1: Reveal overlay with doors wide open
